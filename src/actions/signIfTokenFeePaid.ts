@@ -1,7 +1,14 @@
 import { Transaction, Connection, Keypair } from '@solana/web3.js';
 import type { Cache } from 'cache-manager';
 import base58 from 'bs58';
-import { sha256, simulateRawTransaction, validateTransaction, validateTransfer, AllowedToken } from '../core';
+import {
+    sha256,
+    simulateRawTransaction,
+    validateTransaction,
+    validateTransfer,
+    AllowedToken,
+    validateInstructions,
+} from '../core';
 
 /**
  * Sign transaction by fee payer if the first instruction is a transfer of token fee to given account
@@ -38,6 +45,8 @@ export async function signWithTokenFee(
         maxSignatures,
         lamportsPerSignature
     );
+
+    await validateInstructions(transaction, feePayer);
 
     // Check that the transaction contains a valid transfer to Octane's token account
     const transfer = await validateTransfer(connection, transaction, allowedTokens);
